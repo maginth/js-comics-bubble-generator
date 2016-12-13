@@ -3,7 +3,7 @@ Comics Bubble Generator –  A client side javascript generator
 
 ***Fast hight quality generation. No data, just js, save your network bandwidth !***
 
-![preview](http://aekuo.com/mathieu/bubble/preview.jpg "preview")  
+![preview](/../image_branch/preview.jpg?raw=true "preview")  
 
 
 ## LIVE DEMO
