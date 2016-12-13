@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html><head>
+	<title>bubble test</title>
+	<style type="text/css">
+		body {
+			overflow: scroll;
+			user-select: none;
+		}
+		div.bulle {
+			border: 4px solid #762800;
+			box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+			position: absolute;
+			border-radius: 4em / 2.5em;
+			cursor: move;
+		    background: white;
+		}
+		div.bulle div {
+			text-align: center;
+			margin: 1em;
+		    color: #762800;
+		    font-size: 1.2em;
+		    font-family: cursive;
+		}
+		form * {
+			border-radius : 5px;
+		}
+	</style>
+<style type="text/css"></style></head>
+<body>
+
+	<div class="bulle" id="b0" style="background: rgb(255, 254, 236); left: 386px; top: 454px; border-radius: 52px; height: 95px; font-size: 1.3em; border-color: orange;"><div style="
+    color: orange;
+    margin-top: 13px;
+    line-height: 30px;
+">^ ^<br> U<br><br>Bye !</div></div>
+	<div class="bulle" id="b1" style="left: 85px; top: 350px; border-radius: 2%; border: 2px solid green; background: rgb(191, 244, 130); color: green; box-shadow: rgba(255, 255, 128, 0.8) 2px 2px 10px 10px;"><div style="
+    color: green;
+    font-family: serif;
+">Don't bother,<br>tail color, border<br> and shadow are automatic</div></div>
+	<div class="bulle" id="b2" style="left: 387px; top: 252px; border: 1px solid;"><div style="
+    color: black;
+">start with<br> new Bulle(...)</div></div>
+	<div class="bulle" id="b3" style="background: rgb(222, 195, 249); left: 320px; top: 27px;"><div style="
+    /* background: red; */
+">Each bubble<br> is generated<br> on the flight</div></div>
+	<div class="bulle" id="b4" style="left: 133px; top: 188px; border: none; box-shadow: rgb(13, 28, 116) 2px 2px 10px;"><div style="
+    border-radius: none;
+    color: #1a2a86;
+">Hello !<br> this is a preview</div></div>
+	<div class="bulle" id="b5" style="left: 38px; top: 55px; border: none; width: 100px; border-radius: 50%;"><div style="
+    color: black;
+">^   ^<br>  O</div></div>
+
+	<script type="text/javascript" src="bulle.js"></script>
+	<script type="text/javascript">
+		var b = document.getElementsByClassName("bulle");
+		var canvas = [0,1,2,3,4,5].map(() => document.createElement("canvas"));
+		var bulle = new Bulle(2, 20, 0.05, -15);
+		for (var el of b ) (function(el) {
+			var x, y;
+			el.addEventListener("mousedown", function(e) {
+				y = el.offsetTop - e.clientY;
+				x = el.offsetLeft - e.clientX;
+				window.addEventListener("mousemove", refresh);
+			});
+			function refresh(e) {
+				if (e.clientX && e.clientY) {
+					el.style.left = (x + e.clientX) + "px";
+					el.style.top = (y + e.clientY) + "px";
+				}
+				bulle.type = 2
+				bulle.bulleConnect(b[0], b[1], canvas[1]);
+				bulle.bulleConnect(b[1], b[2], canvas[2]);
+				bulle.bulleConnect(b[2], b[3], canvas[3]);
+				bulle.type = 1;
+				bulle.bulleConnect(b[3], b[4], canvas[4]);
+				bulle.type = 0;
+				bulle.bulleConnect(b[4], b[5], canvas[5]);
+			};
+
+			window.addEventListener("mouseup", function () {window.removeEventListener("mousemove", refresh)});
+			window.addEventListener("load", refresh);
+		})(el);
+		function refreshAll() {
+			window.dispatchEvent(new Event('load'));
+		}
+	</script>
+
+</body></html>
