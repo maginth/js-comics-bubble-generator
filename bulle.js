@@ -1,3 +1,13 @@
+//	                                               (\_/)
+//	  /\_/\                                        (^ç^)
+//	w( °u° )                                        ) (
+//	|(~~~~~)        /|/|  __   _  `  __  /-/)   ___/(_)\__
+//	|(")_(")~>    (/   |_(_/(_( )_|_//(_/_/\_      "w w"
+//	                           / 
+//	                          (_)
+//
+// https://github.com/maginth/js-comics-bubble-generator
+
 var d = document;
 var head=d.getElementsByTagName('head')[0],
 body=d.getElementsByTagName('body')[0],
