@@ -1,3 +1,14 @@
+//	                                               (\_/)
+//	  /\_/\                                        (^ç^)
+//	w( °u° )                                        ) (
+//	|(~~~~~)        /|/|  __   _  `  __  /-/)   ___/(_)\__
+//	|(")_(")~>    (/   |_(_/(_( )_|_//(_/_/\_      "w w"
+//	                           / 
+//	                          (_)
+//
+// https://github.com/maginth/js-comics-bubble-generator
+
+"use strict"
 var d = document;
 var head=d.getElementsByTagName('head')[0],
 body=d.getElementsByTagName('body')[0],
@@ -43,12 +54,15 @@ function Bulle(type,base,marge,contour) {
 		if (marge != 0) marge = marge || 0.1;
 		var c = canvas || create('canvas'),
 		g = c.getContext('2d'),
-		s = c.style; s.position = 'absolute',
-		scs = getComputedStyle(sc);
-		var cc = scs.backgroundColor, l = parseInt(scs.borderWidth||sc.style.borderWidth)||0, ll = l/2;
+		s = c.style; s.position = 'absolute';
+		var scs = getComputedStyle(sc);
+		var btw = parseFloat(scs.borderTopWidth)/2,
+			bbw = parseFloat(scs.borderBottomWidth)/2,
+			brw = parseFloat(scs.borderRightWidth)/2,
+			blw = parseFloat(scs.borderLeftWidth)/2;
 		var x0=0,y0=0,x1,x2,y1,y2,x3,y3,
-		sxx=sc.offsetLeft-ll,syy=sc.offsetTop-ll,
-		sw=sc.offsetWidth+l,sh=sc.offsetHeight+l,
+		sxx=sc.offsetLeft-blw,syy=sc.offsetTop-btw,
+		sw=sc.offsetWidth+blw+brw,sh=sc.offsetHeight+btw+bbw,
 		dw=ds.offsetWidth,dh=ds.offsetHeight,
 		dxx=ds.offsetLeft,dyy=ds.offsetTop;
 		var sx = sxx-dxx-dw,sy = syy-dyy-dh,
@@ -57,19 +71,14 @@ function Bulle(type,base,marge,contour) {
 		base2=0,ox=0,oy=0,w=0,h=0,px;
 		
 		s.top=s.bottom=s.left=s.right='';
-		
-		if (scs.boxShadow != '' && scs.boxShadow.search('inset') == -1) {
-			px = scs.boxShadow.match(/\d+px/g) || [0,0,0];
-			base2 = (parseFloat(px[2]) || 0)+ll;
-			ox = parseFloat(px[0]); oy = parseFloat(px[1]);
-		}
 		var top=ssy+sy>0,left=ssx+sx>0,horiz=false;
+
 		var rndx,rndy;
 		function coin(b,bb) {
-			var rd=scs['border'+(b? 'Top':'Bottom')+(bb? 'Left':'Right')+'Radius'].match(/\d+(px|%)/g);
+			var rd=scs['border'+(b? 'Top':'Bottom')+(bb? 'Left':'Right')+'Radius'].match(/[\d\.]+(px|%)/g);
 			rndx=parseFloat(rd[0]) || 0; if (rd[0].substr(-1)=='%') rndx*=sw/100;
 			rndy=parseFloat(rd[1] || rd[0]) || 0; if ((rd[1] || rd[0]).substr(-1)=='%') rndx*=sh/100;
-			rndx-=l; rndy-=l;
+			rndx-=bb ? blw : brw; rndy-=b ? btw : bbw;
 		}
 		coin(top,left);
 		var rdx=rndx,rdy=rndy;
@@ -92,7 +101,6 @@ function Bulle(type,base,marge,contour) {
 			coin(!top,left);
 			if (y0>sh-rndy-base) {
 				y0 = Math.min(sh-y0,sh-rdy-base);
-				rdx = rndx; rdy = rndy;
 				top = !top;
 				sgnt = -sgnt;
 			}
@@ -118,7 +126,6 @@ function Bulle(type,base,marge,contour) {
 			coin(top,!left);
 			if (x0>sw-rndx-base) {
 				x0 = Math.min(sw-x0,sw-rdx-base);
-				rdx = rndx; rdy = rndy;
 				left = !left;
 				sgnl = -sgnl;
 			}
@@ -126,6 +133,16 @@ function Bulle(type,base,marge,contour) {
 			y1=sgnt*bord(x0+sgnl*x1,rdx,rdy);
 			y3=sgnt*bord(x0+sgnl*x3,rdx,rdy);
 		}
+
+		var borderPos = 'border' + (horiz ? (top? 'Top':'Bottom') : (left? 'Left':'Right'));
+		var cc = scs.backgroundColor, l = parseFloat(scs[borderPos+"Width"])||0, ll = l/2;
+		
+		if (scs.boxShadow != '' && scs.boxShadow.search('inset') == -1) {
+			px = scs.boxShadow.match(/[\d\.]+px/g) || [0,0,0];
+			base2 = (parseFloat(px[2]) || 0)+ll;
+			ox = parseFloat(px[0]); oy = parseFloat(px[1]);
+		}
+
 		ajusteX(x1); ajusteX(x2); ajusteX(x3); 
 		ajusteY(y1); ajusteY(y2); ajusteY(y3);
 		ajusteX(ox-base2);ajusteX(w+ox+base2);
@@ -142,6 +159,9 @@ function Bulle(type,base,marge,contour) {
 		if (left) s.left = x0+"px"; else s.right = x0+"px";
 		
 		g.lineWidth = l;
+		g.lineCap = "round";
+		g.lineJoin = "round";
+		//g.miterLimit = 100;
 		g.save();
 		if (px) {
 			g.shadowOffsetX=ox+10000;
@@ -155,7 +175,7 @@ function Bulle(type,base,marge,contour) {
 		}
 		var xc = (left)?w:0 , yc=(top)? h:0,
 		xo=left?-x0+rdx:x0+w-rdx,yo=top?-y0+rdy:y0+h-rdy;
-		rdx+=l;rdy+=l;
+		rdx+=2*(left ? blw : brw); rdy+=2*(top ? btw : bbw);
 		if (horiz) g.clearRect(xc,yc,xo-xc,yo-yc-sgnt*rdy);
 		else g.clearRect(xc,yc,xo-xc-sgnl*rdx,yo-yc);
 		g.save();
@@ -183,10 +203,10 @@ function Bulle(type,base,marge,contour) {
 		g.beginPath();
 		type(g,x1,y1,x2,y2,x3,y3);
 		if (cc) {g.fillStyle = cc;g.fill();}
-		if (l) {g.strokeStyle = scs.borderColor||sc.style.borderColor;g.stroke();}
+		if (l) {g.strokeStyle = scs[borderPos+"Color"];g.stroke();}
 		
 		sc.insertBefore(c,sc.firstChild);
-		//console.log({base,type,marge,contour,c,g,s,scs,cc,l,ll,x0,y0,x1,x2,y1,y2,x3,y3,sxx,syy,sw,sh,dw,dh,dxx,dyy,sx,sy,ssx,ssy,basex,basey,base2,ox,oy,w,h,px,top,left,horiz,rndx,rndy,rdx,rdy,sgnl,sgnt,xc,yc,xo,yo,vx,vy,n,nn,xx1,yy1,xx3,yy3});
+		//console.log({base,type,marge,contour,c,g,s,scs,cc,btw,bbw,blw,brw,l,ll,x0,y0,x1,x2,y1,y2,x3,y3,sxx,syy,sw,sh,dw,dh,dxx,dyy,sx,sy,ssx,ssy,basex,basey,base2,ox,oy,w,h,px,top,left,horiz,rndx,rndy,rdx,rdy,sgnl,sgnt,xc,yc,xo,yo,vx,vy,n,nn,xx1,yy1,xx3,yy3});
 		return c;
 	}
 
